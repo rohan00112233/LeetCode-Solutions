@@ -1,13 +1,19 @@
-CREATE FUNCTION getNthHighestSalary(N INT) RETURNS INT
+CREATE OR REPLACE FUNCTION NthHighestSalary(N INT)
+RETURNS TABLE (Salary INT) AS $$
 BEGIN
+    IF N <= 0 THEN
+        RETURN QUERY SELECT NULL::INT;
+        RETURN;
+    END IF;
 
-    SET N = N - 1;
+    N := N - 1;
 
-    RETURN (
-        SELECT DISTINCT salary
-        FROM Employee
-        ORDER BY salary DESC
+    RETURN QUERY
+    SELECT (
+        SELECT DISTINCT e.salary
+        FROM Employee e
+        ORDER BY e.salary DESC
         LIMIT 1 OFFSET N
     );
-
 END;
+$$ LANGUAGE plpgsql;
